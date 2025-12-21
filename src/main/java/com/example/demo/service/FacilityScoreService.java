@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.FacilityScoreDto;
 import com.example.demo.entity.FacilityScore;
 import com.example.demo.entity.Property;
 import com.example.demo.repository.FacilityScoreRepository;
@@ -21,23 +20,17 @@ public class FacilityScoreService {
     @Autowired
     private RatingLogService ratingLogService;
 
-    public FacilityScore submitScore(Long propertyId, FacilityScoreDto dto) {
+    public FacilityScore submitScore(Long propertyId, FacilityScore score) {
         Property property = propertyService.getProperty(propertyId);
-
-        FacilityScore score = new FacilityScore();
         score.setProperty(property);
-        score.setSchoolProximity(dto.getSchoolProximity());
-        score.setHospitalProximity(dto.getHospitalProximity());
-        score.setTransportAccess(dto.getTransportAccess());
-        score.setSafetyScore(dto.getSafetyScore());
 
         FacilityScore savedScore = facilityScoreRepository.save(score);
         
         ratingLogService.addLog(propertyId, "Facility score submitted: " + 
-            "School=" + dto.getSchoolProximity() + 
-            ", Hospital=" + dto.getHospitalProximity() + 
-            ", Transport=" + dto.getTransportAccess() + 
-            ", Safety=" + dto.getSafetyScore());
+            "School=" + score.getSchoolProximity() + 
+            ", Hospital=" + score.getHospitalProximity() + 
+            ", Transport=" + score.getTransportAccess() + 
+            ", Safety=" + score.getSafetyScore());
 
         return savedScore;
     }
@@ -45,15 +38,5 @@ public class FacilityScoreService {
     public FacilityScore getLatestScore(Long propertyId) {
         return facilityScoreRepository.findFirstByPropertyIdOrderBySubmittedAtDesc(propertyId)
                 .orElseThrow(() -> new RuntimeException("No facility score found for property: " + propertyId));
-    }
-
-    public FacilityScoreDto convertToDto(FacilityScore score) {
-        FacilityScoreDto dto = new FacilityScoreDto();
-        dto.setId(score.getId());
-        dto.setSchoolProximity(score.getSchoolProximity());
-        dto.setHospitalProximity(score.getHospitalProximity());
-        dto.setTransportAccess(score.getTransportAccess());
-        dto.setSafetyScore(score.getSafetyScore());
-        return dto;
     }
 }

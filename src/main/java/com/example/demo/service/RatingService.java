@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.RatingResultDto;
 import com.example.demo.entity.FacilityScore;
 import com.example.demo.entity.Property;
 import com.example.demo.entity.RatingResult;
@@ -30,7 +29,7 @@ public class RatingService {
     @Autowired
     private RatingCalculatorUtil ratingCalculator;
 
-    public RatingResultDto generateRating(Long propertyId) {
+    public RatingResult generateRating(Long propertyId) {
         Property property = propertyService.getProperty(propertyId);
         
         FacilityScore facilityScore;
@@ -66,23 +65,11 @@ public class RatingService {
 
         ratingLogService.addLog(propertyId, "Rating generated successfully: " + finalRating + " (" + category + ")");
 
-        return convertToDto(savedResult);
+        return savedResult;
     }
 
-    public RatingResultDto getLatestRating(Long propertyId) {
-        RatingResult result = ratingResultRepository.findTopByPropertyIdOrderByRatedAtDesc(propertyId)
+    public RatingResult getLatestRating(Long propertyId) {
+        return ratingResultRepository.findTopByPropertyIdOrderByRatedAtDesc(propertyId)
                 .orElseThrow(() -> new RuntimeException("No rating found for property: " + propertyId));
-        
-        return convertToDto(result);
-    }
-
-    private RatingResultDto convertToDto(RatingResult result) {
-        return new RatingResultDto(
-            result.getId(),
-            result.getFinalRating(),
-            result.getRatingCategory(),
-            result.getRatedAt(),
-            result.getDetails()
-        );
     }
 }

@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.PropertyDto;
 import com.example.demo.entity.Property;
 import com.example.demo.repository.PropertyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +15,7 @@ public class PropertyService {
     @Autowired
     private PropertyRepository propertyRepository;
 
-    public Property createProperty(PropertyDto dto) {
-        Property property = new Property();
-        property.setTitle(dto.getTitle());
-        property.setAddress(dto.getAddress());
-        property.setCity(dto.getCity());
-        property.setPrice(dto.getPrice());
-        property.setAreaSqFt(dto.getAreaSqFt());
+    public Property createProperty(Property property) {
         return propertyRepository.save(property);
     }
 
@@ -36,16 +29,5 @@ public class PropertyService {
             return propertyRepository.findByCityContainingIgnoreCase(city.trim(), pageable);
         }
         return propertyRepository.findAll(pageable);
-    }
-
-    public PropertyDto convertToDto(Property property) {
-        PropertyDto dto = new PropertyDto();
-        dto.setId(property.getId());
-        dto.setTitle(property.getTitle());
-        dto.setAddress(property.getAddress());
-        dto.setCity(property.getCity());
-        dto.setPrice(property.getPrice());
-        dto.setAreaSqFt(property.getAreaSqFt());
-        return dto;
     }
 }
