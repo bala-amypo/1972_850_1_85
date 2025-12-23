@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.entity.FacilityScore;
 import com.example.demo.entity.Property;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.FacilityScoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,6 @@ public class FacilityScoreService {
 
     public FacilityScore getLatestScore(Long propertyId) {
         return facilityScoreRepository.findFirstByPropertyIdOrderBySubmittedAtDesc(propertyId)
-                .orElseThrow(() -> new RuntimeException("No facility score found for property: " + propertyId));
+                .orElseThrow(() -> new ResourceNotFoundException("No facility score found for property: " + propertyId));
     }
 }

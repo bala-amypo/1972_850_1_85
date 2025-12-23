@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.entity.Property;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.PropertyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,7 +22,7 @@ public class PropertyService {
 
     public Property getProperty(Long id) {
         return propertyRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Property not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Property not found with id: " + id));
     }
 
     public Page<Property> listProperties(Pageable pageable, String city) {

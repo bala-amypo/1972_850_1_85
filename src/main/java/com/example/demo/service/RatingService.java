@@ -4,6 +4,8 @@ import com.example.demo.entity.FacilityScore;
 import com.example.demo.entity.Property;
 import com.example.demo.entity.RatingResult;
 import com.example.demo.entity.RatingResult.RatingCategory;
+import com.example.demo.exception.BadRequestException;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.RatingResultRepository;
 import com.example.demo.util.RatingCalculatorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +37,8 @@ public class RatingService {
         FacilityScore facilityScore;
         try {
             facilityScore = facilityScoreService.getLatestScore(propertyId);
-        } catch (Exception e) {
-            throw new RuntimeException("No facility score found for property. Please submit facility scores first.");
+        } catch (ResourceNotFoundException e) {
+            throw new BadRequestException("No facility score found for property. Please submit facility scores first.");
         }
 
         ratingLogService.addLog(propertyId, "Starting rating generation process");
@@ -70,6 +72,6 @@ public class RatingService {
 
     public RatingResult getLatestRating(Long propertyId) {
         return ratingResultRepository.findTopByPropertyIdOrderByRatedAtDesc(propertyId)
-                .orElseThrow(() -> new RuntimeException("No rating found for property: " + propertyId));
+                .orElseThrow(() -> new ResourceNotFoundException("No rating found for property: " + propertyId));
     }
 }
