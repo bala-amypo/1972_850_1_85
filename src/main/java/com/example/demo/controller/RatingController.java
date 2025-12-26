@@ -2,27 +2,27 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.RatingResult;
 import com.example.demo.service.RatingService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/ratings")
 public class RatingController {
 
-    @Autowired
-    private RatingService ratingService;
+    private final RatingService service;
+
+    public RatingController(RatingService service) {
+        this.service = service;
+    }
 
     @PostMapping("/generate/{propertyId}")
-    public ResponseEntity<RatingResult> generateRating(@PathVariable Long propertyId) {
-        RatingResult result = ratingService.generateRating(propertyId);
-        return new ResponseEntity<>(result, HttpStatus.CREATED);
+    public ResponseEntity<RatingResult> generate(@PathVariable Long propertyId) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(service.generateRating(propertyId));
     }
 
     @GetMapping("/property/{propertyId}")
-    public ResponseEntity<RatingResult> getLatestRating(@PathVariable Long propertyId) {
-        RatingResult result = ratingService.getLatestRating(propertyId);
-        return ResponseEntity.ok(result);
+    public RatingResult get(@PathVariable Long propertyId) {
+        return service.getRating(propertyId);
     }
 }

@@ -2,31 +2,30 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.FacilityScore;
 import com.example.demo.service.FacilityScoreService;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/scores")
 public class FacilityScoreController {
 
-    @Autowired
-    private FacilityScoreService facilityScoreService;
+    private final FacilityScoreService service;
+
+    public FacilityScoreController(FacilityScoreService service) {
+        this.service = service;
+    }
 
     @PostMapping("/{propertyId}")
-    public ResponseEntity<FacilityScore> submitScore(
+    public ResponseEntity<FacilityScore> create(
             @PathVariable Long propertyId,
-            @Valid @RequestBody FacilityScore score) {
-        
-        FacilityScore savedScore = facilityScoreService.submitScore(propertyId, score);
-        return new ResponseEntity<>(savedScore, HttpStatus.CREATED);
+            @RequestBody FacilityScore score) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(service.createScore(propertyId, score));
     }
 
     @GetMapping("/{propertyId}")
-    public ResponseEntity<FacilityScore> getLatestScore(@PathVariable Long propertyId) {
-        FacilityScore score = facilityScoreService.getLatestScore(propertyId);
-        return ResponseEntity.ok(score);
+    public FacilityScore get(@PathVariable Long propertyId) {
+        return service.getScore(propertyId);
     }
 }
