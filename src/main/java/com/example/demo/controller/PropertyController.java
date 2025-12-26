@@ -3,9 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.entity.Property;
 import com.example.demo.service.PropertyService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,34 +14,35 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/properties")
 public class PropertyController {
 
-    @Autowired
-    private PropertyService propertyService;
+    private final PropertyService propertyService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    public PropertyController(PropertyService propertyService) {
+        this.propertyService = propertyService;
+    }
+
+    // ---------------- CREATE PROPERTY ----------------
+    // Used by tests (ADMIN only)
     @PostMapping
-    public ResponseEntity<Property> createProperty(@Valid @RequestBody Property property) {
-        Property savedProperty = propertyService.createProperty(property);
-        return new ResponseEntity<>(savedProperty, HttpStatus.CREATED);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Property> addProperty(
+            @Valid @RequestBody Property property) {
+
+        Property saved = propertyService.addProperty(property);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
+    // ---------------- LIST PROPERTIES ----------------
     @GetMapping
-    public ResponseEntity<Page<Property>> listProperties(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+    public Page<Property> listProperties(
+            Pageable pageable,
             @RequestParam(required = false) String city) {
-        
-        try {
-            Pageable pageable = PageRequest.of(page, size);
-            Page<Property> properties = propertyService.listProperties(pageable, city);
-            return ResponseEntity.ok(properties);
-        } catch (Exception e) {
-            throw new RuntimeException("Error retrieving properties: " + e.getMessage(), e);
-        }
+
+        return propertyService.listProperties(pageable, city);
     }
 
+    // ---------------- GET PROPERTY BY ID ----------------
     @GetMapping("/{id}")
-    public ResponseEntity<Property> getProperty(@PathVariable Long id) {
-        Property property = propertyService.getProperty(id);
-        return ResponseEntity.ok(property);
+    public Property getProperty(@PathVariable Long id) {
+        return propertyService.getProperty(id);
     }
 }
