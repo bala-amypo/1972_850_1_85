@@ -1,6 +1,7 @@
 package com.example.demo.config;
 
 import com.example.demo.security.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,24 +27,26 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            // Disable CSRF for REST APIs
             .csrf(csrf -> csrf.disable())
 
-            // Authorization rules
+            // 🔑 FORCE 401 FOR UNAUTHENTICATED REQUESTS
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(
+                    (request, response, authException) ->
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+                )
+            )
+
             .authorizeHttpRequests(auth -> auth
-                // Public endpoints
                 .requestMatchers(
                         "/auth/**",
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
                         "/swagger-ui.html"
                 ).permitAll()
-
-                // Everything else requires authentication
                 .anyRequest().authenticated()
             )
 
-            // Add JWT filter
             .addFilterBefore(
                     jwtAuthenticationFilter,
                     UsernamePasswordAuthenticationFilter.class
@@ -52,13 +55,11 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Password encoder (REQUIRED by tests)
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // AuthenticationManager (REQUIRED by tests)
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration
