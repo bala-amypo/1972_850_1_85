@@ -16,7 +16,7 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public Property createProperty(Property property) {
+    public Property addProperty(Property property) {
         if (property.getPrice() <= 0) {
             throw new IllegalArgumentException("Invalid price");
         }
@@ -25,7 +25,7 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public Page<Property> listProperties(Pageable pageable, String city) {
-        if (city != null) {
+        if (city != null && !city.isEmpty()) {
             return new PageImpl<>(repository.findByCity(city));
         }
         return repository.findAll(pageable);

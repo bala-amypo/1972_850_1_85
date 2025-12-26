@@ -6,8 +6,10 @@ import org.springframework.data.domain.Pageable;
 
 public interface PropertyService {
 
-    Property createProperty(Property property);
+    // REQUIRED BY TEST
+    Property addProperty(Property property);
 
+    // used by controller
     Page<Property> listProperties(Pageable pageable, String city);
 
     Property getProperty(Long id);
