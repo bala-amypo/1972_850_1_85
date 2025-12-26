@@ -1,24 +1,14 @@
-package com.example.demo.service.impl;
+package com.example.demo.service;
 
 import com.example.demo.entity.Property;
-import com.example.demo.repository.PropertyRepository;
-import com.example.demo.service.PropertyService;
-import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-@Service
-public class PropertyServiceImpl implements PropertyService {
+public interface PropertyService {
 
-    private final PropertyRepository repo;
+    Property createProperty(Property property);
 
-    public PropertyServiceImpl(PropertyRepository repo) {
-        this.repo = repo;
-    }
+    Page<Property> listProperties(Pageable pageable, String city);
 
-    @Override
-    public Property addProperty(Property property) {
-        if (property.getPrice() <= 0) {
-            throw new IllegalArgumentException("Invalid price");
-        }
-        return repo.save(property);
-    }
+    Property getProperty(Long id);
 }
