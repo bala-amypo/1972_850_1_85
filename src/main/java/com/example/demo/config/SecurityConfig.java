@@ -28,6 +28,7 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.disable())
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint(
                     (request, response, authException) ->
@@ -35,12 +36,14 @@ public class SecurityConfig {
                 )
             )
             .authorizeHttpRequests(auth -> auth
+                // 🔓 PUBLIC
+                .requestMatchers("/auth/**").permitAll()
                 .requestMatchers(
-                    "/auth/**",
-                    "/swagger-ui/**",
-                    "/v3/api-docs/**",
-                    "/swagger-ui.html"
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**"
                 ).permitAll()
+                // 🔐 PROTECTED
                 .anyRequest().authenticated()
             )
             .addFilterBefore(
