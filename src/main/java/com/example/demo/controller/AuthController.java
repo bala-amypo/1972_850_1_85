@@ -2,9 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.RegisterRequest;
+import com.example.demo.security.JwtTokenProvider;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.security.JwtTokenProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,8 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -34,7 +32,6 @@ public class AuthController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    // ✅ REGISTER (NO AUTHENTICATION HERE)
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
 
@@ -46,19 +43,21 @@ public class AuthController {
 
         userRepository.save(user);
 
-        // 🔥 Generate JWT directly (NO authenticationManager)
-        String token = jwtTokenProvider.generateTokenFromEmail(
-                user.getEmail(),
-                user.getRole()
+        Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail().toLowerCase(),
+                        request.getPassword()
+                )
         );
 
+        String token = jwtTokenProvider.generateToken(auth, user);
+
         return new ResponseEntity<>(
-                Map.of("token", token),
+                java.util.Map.of("token", token),
                 HttpStatus.CREATED
         );
     }
 
-    // 🔐 LOGIN (AUTHENTICATION REQUIRED)
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
 
@@ -75,6 +74,6 @@ public class AuthController {
 
         String token = jwtTokenProvider.generateToken(auth, user);
 
-        return ResponseEntity.ok(Map.of("token", token));
+        return ResponseEntity.ok(java.util.Map.of("token", token));
     }
 }

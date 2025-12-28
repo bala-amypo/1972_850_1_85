@@ -12,37 +12,41 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
+    private static final long EXPIRATION_TIME = 24 * 60 * 60 * 1000; // 1 day
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private final long jwtExpirationMs = 86400000; // 24 hours
 
-    // ✅ Used during LOGIN
     public String generateToken(Authentication authentication, User user) {
+
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + EXPIRATION_TIME);
+
         return Jwts.builder()
                 .setSubject(user.getEmail())
+                .claim("userId", user.getId())
                 .claim("role", user.getRole())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .setIssuedAt(now)
+                .setExpiration(expiry)
                 .signWith(key)
                 .compact();
     }
 
-    // ✅ Used during REGISTER (NO authentication)
-    public String generateTokenFromEmail(String email, String role) {
-        return Jwts.builder()
-                .setSubject(email)
-                .claim("role", role)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(key)
-                .compact();
-    }
-
-    public String getEmailFromToken(String token) {
-        return Jwts.parserBuilder()
+    public Long getUserIdFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
+
+        return claims.get("userId", Long.class);
+    }
+
+    public String getEmailFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getSubject();
     }
 }
