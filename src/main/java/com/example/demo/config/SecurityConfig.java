@@ -28,28 +28,24 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf.disable())
-
-            // 🔑 FORCE 401 FOR UNAUTHENTICATED REQUESTS
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint(
                     (request, response, authException) ->
                         response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
                 )
             )
-
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                        "/auth/**",
-                        "/swagger-ui/**",
-                        "/v3/api-docs/**",
-                        "/swagger-ui.html"
+                    "/auth/**",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/swagger-ui.html"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
-
             .addFilterBefore(
-                    jwtAuthenticationFilter,
-                    UsernamePasswordAuthenticationFilter.class
+                jwtAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter.class
             );
 
         return http.build();
@@ -62,8 +58,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authenticationConfiguration
-    ) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+            AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 }
