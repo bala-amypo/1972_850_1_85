@@ -158,6 +158,7 @@ public void testSwaggerUiAccessibleWithoutAuth() throws Exception {
             .andExpect(status().isOk());
 }
 
+
     @Test(priority = 1, groups = "servlet")
     public void testAuthRegisterEndpointExists() throws Exception {
         RegisterRequest req = new RegisterRequest();
@@ -180,11 +181,13 @@ public void testRootReturns401WithoutAuth() throws Exception {
 }
 
 
+
    @Test(priority = 1, groups = "servlet")
 public void testTomcatHandlesBadMethod() throws Exception {
     mockMvc.perform(MockMvcRequestBuilders.put("/auth/login"))
             .andExpect(status().isInternalServerError()); // 500
 }
+
 
 @Test(priority = 1, groups = "servlet")
 public void testServletHandlesUnsupportedMediaType() throws Exception {
@@ -193,6 +196,7 @@ public void testServletHandlesUnsupportedMediaType() throws Exception {
                     .contentType(MediaType.TEXT_PLAIN))
             .andExpect(status().isInternalServerError()); // 500
 }
+
 
 
     @Test(priority = 1, groups = "servlet")
@@ -436,6 +440,7 @@ public void testDeletePropertyCascadesRatingLogs() {
 }
 
 
+
  @Test(priority = 4, groups = "hibernate",
         expectedExceptions = jakarta.validation.ConstraintViolationException.class)
 public void testValidationOnFacilityScoreRange() {
@@ -448,6 +453,7 @@ public void testValidationOnFacilityScoreRange() {
 
     facilityScoreRepository.saveAndFlush(fs);  // throws ConstraintViolationException
 }
+
 
     @Test(priority = 4, groups = "hibernate")
     public void testFindPropertyByCityHql() {
@@ -646,6 +652,7 @@ public void testPropertyAssignedUsersManyToMany() {
     Assert.assertEquals(reloaded.getAssignedUsers().size(), 2);
 }
 
+
     @Test(priority = 6, groups = "many-to-many")
     public void testManyToManyRemovingAssociation() {
         User user = new User();
@@ -753,6 +760,7 @@ public void testManyToManyPropertyDeletionRemovesAssociation() {
     User reloaded = userRepository.findById(userId).orElseThrow();
     Assert.assertTrue(reloaded.getAssignedProperties().isEmpty());
 }
+
 
     // ------------------------------------------------------------------------------------
     // 7. Implement basic security controls and JWT token-based authentication
@@ -951,5 +959,3 @@ public void testManyToManyPropertyDeletionRemovesAssociation() {
         Assert.assertNotNull(avg);
     }
 }
-
-
